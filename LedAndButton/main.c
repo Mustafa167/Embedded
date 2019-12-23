@@ -29,7 +29,7 @@ void printMsg(char *msg);
 
 //task prototypes
 void led_task_handler(void *params);
-void button_task_handler(void *params);
+void button_handler(void *params);
 
 //global space for variables
 uint8_t button_status_flag = NOT_PRESSED;
@@ -49,8 +49,6 @@ int main(void)
 	//led task
 	xTaskCreate(led_task_handler, "LED-TASK", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
-	//button task
-	xTaskCreate(button_task_handler, "BUTTON-TASK", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
 	//lets start the scheduler
 	vTaskStartScheduler();
@@ -75,12 +73,9 @@ void led_task_handler(void *params)
 	}
 }
 
-void button_task_handler(void *params)
+void button_handler(void *params)
 {
-	while(1)
-	{
-
-	}
+	button_status_flag ^= 1;
 }
 
 static void privateSetupHardware(void)
@@ -97,6 +92,7 @@ static void privateSetupGPIO(void)
 {
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOE,ENABLE);
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA,ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG,ENABLE);
 
 	//this function is board specific
 	GPIO_InitTypeDef led_init , button_init;
@@ -105,6 +101,8 @@ static void privateSetupGPIO(void)
 	led_init.GPIO_Pin = GPIO_Pin_14;
 	led_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	led_init.GPIO_Speed = GPIO_Speed_2MHz;
+
+
 
 	GPIO_Init(GPIOE,&led_init);
 
@@ -115,6 +113,34 @@ static void privateSetupGPIO(void)
 	button_init.GPIO_Speed = GPIO_Speed_2MHz;
 
 	GPIO_Init(GPIOA,&button_init);
+
+	//interrupt configuration for the button
+	//1. System configuration for the exti line (SYSCFG settings)
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
+
+	//2. EXTI0 configuration 0, falling edge, interrupt mode
+	EXTI_InitTypeDef exti_init;
+	exti_init.EXTI_Line = EXTI_Line0;
+	exti_init.EXTI_LineCmd = ENABLE;
+	exti_init.EXTI_Mode = EXTI_Mode_Interrupt;
+	exti_init.EXTI_Trigger = EXTI_Trigger_Falling;
+
+	EXTI_Init(&exti_init);
+
+	//3. Enable NVIC interrupts
+	NVIC_SetPriority(EXTI0_IRQn,5);
+	NVIC_EnableIRQ(EXTI0_IRQn);
+
+}
+
+void EXTI0_IRQHandler(void)
+{
+
+	traceISR_ENTER();
+	//1. clear the interrupt pending bit
+	EXTI_ClearITPendingBit(EXTI_Line0);
+	button_handler(NULL);
+	traceISR_EXIT();
 }
 
 static void privateSetupUART(void)
