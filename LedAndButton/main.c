@@ -36,6 +36,7 @@ uint8_t button_status_flag = NOT_PRESSED;
 
 int main(void)
 {
+	DWT->CTRL  |= ( 1 << 0 ); //Enable the cycle counting for system view counting in SEGGER
 
 	//1. Reset the RCC clock configuration to the default reset state
 	// HSI on, PLL off, HSE off system clock = 8MHz, cpu clock = 8Mhz
@@ -45,6 +46,10 @@ int main(void)
 	SystemCoreClockUpdate();
 
 	privateSetupHardware();
+
+	//Start recording
+	SEGGER_SYSVIEW_Conf();
+	SEGGER_SYSVIEW_Start();
 
 	//led task
 	xTaskCreate(led_task_handler, "LED-TASK", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
