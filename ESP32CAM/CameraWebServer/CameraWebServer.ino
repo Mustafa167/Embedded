@@ -20,8 +20,8 @@
 
 #include "camera_pins.h"
 
-const char* ssid = "Attaria";
-const char* password = "9560703980";
+const char* ssid = "*******";
+const char* password = "*******";
 
 
 
