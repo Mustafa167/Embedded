@@ -1,8 +1,9 @@
 #include "esp_camera.h"
 #include <WiFi.h>
+#include <WiFiManager.h>
 
 //
-// WARNING!!! PSRAM IC required for UXGA resolution and high JPEG quality
+// WARNING!!! PSRAM IC required for UXGACamsolution and high JPEG quality
 //            Ensure ESP32 Wrover Module or other board with PSRAM is selected
 //            Partial images will be transmitted if image exceeds buffer size
 //
@@ -19,8 +20,12 @@
 
 #include "camera_pins.h"
 
-const char* ssid = "*********";
-const char* password = "*********";
+const char* ssid = "Attaria";
+const char* password = "9560703980";
+
+
+
+
 
 void startCameraServer();
 
@@ -90,7 +95,16 @@ void setup() {
   s->set_hmirror(s, 1);
 #endif
 
-  WiFi.begin(ssid, password);
+  //WiFi.begin(ssid, password);
+  WiFiManager wm;
+  wm.resetSettings();
+
+  bool res;
+  res = wm.autoConnect("ESP32-CameraServer","password");
+
+  if(!res){
+    Serial.println("Failed to connect");
+  }
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
