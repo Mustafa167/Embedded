@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wi-Fi Configuration</title>
+         <style>
+			body {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0;
+				flex-direction: column; /* Stack elements vertically */
+			}
+
+			.input-container {
+				display: flex;
+				flex-direction: column; /* Stack inputs and labels vertically */
+				align-items: flex-end; /* Align labels to the right */
+			}
+
+			label {
+				font-weight: bold;
+				margin-right: 10px; /* Add spacing between labels and inputs */
+			}
+
+			input[type="text"] {
+				padding: 10px;
+				width: 300px;
+				margin: 10px 0;
+			}
+
+			/* Style for the form container */
+			form {
+				display: flex;
+				flex-direction: column;
+				align-items: center; /* Center the form horizontally */
+			}
+
+			/* Style for the submit button */
+			button[type="submit"] {
+				padding: 10px 20px;
+				background-color: #007bff;
+				color: #fff;
+				border: none;
+				cursor: pointer;
+			}
+    </style>
+</head>
+<body>
+    <h1>Welcome to Wi-Fi Configuration</h1>
+    <h2>Enter your Wi-Fi SSID and Password</h2>
+    <form action="/configure" method="POST">
+        <div class="input-container">
+            <div>
+                <label for="ssidInputField">SSID:</label>
+                <input type="text" id="ssidInputField" name="ssid" placeholder="Enter SSID here">
+            </div>
+            <div>
+                <label for="passwordInputField">Password:</label>
+                <input type="text" id="passwordInputField" name="password" placeholder="Enter password here">
+            </div>
+        </div>
+        <!-- Submit button -->
+        <button type="submit" id="submitButton" disabled>Submit</button>
+    </form>
+    
+    <script>
+        function checkInputs() {
+            const ssidInput = document.getElementById('ssidInputField');
+            const passwordInput = document.getElementById('passwordInputField');
+            const submitButton = document.getElementById('submitButton');
+            
+            if (ssidInput.value.trim() !== '' && passwordInput.value.trim() !== '') {
+                submitButton.removeAttribute('disabled');
+            } else {
+                submitButton.setAttribute('disabled', 'disabled');
+            }
+        }
+    </script>
+</body>
+</html>
